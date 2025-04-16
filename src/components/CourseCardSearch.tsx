@@ -9,7 +9,7 @@ const CourseCardSearch = ({
   return (
     <div
       onClick={onClick}
-      className={`course-card-search-group ${isSelected ? "course-card-search--selected" : "course-card-search--unselected"}`}
+      className={`course-card-search group ${isSelected ? "course-card-search--selected" : "course-card-search--unselected"}`}
     >
       <div className="course-card-search__image-container">
         <Image
