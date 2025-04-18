@@ -7,6 +7,7 @@ import Link from "next/link";
 
 const NonDashboardNavbar = () => {
   const { user } = useUser();
+  console.log("user:", user);
   const userRole = user?.publicMetadata?.userType as "student" | "teacher";
   return (
     <nav className="nondashboard-navbar">
