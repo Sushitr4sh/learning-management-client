@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { BaseQueryApi, FetchArgs } from "@reduxjs/toolkit/query";
+import { User } from "@clerk/nextjs/server";
 
 const customBaseQuery = async (
   args: string | FetchArgs,
@@ -31,8 +32,17 @@ export const api = createApi({
   baseQuery: customBaseQuery, // Anytime we create an api request, this is the base url that we're going to be using.
   reducerPath: "api",
   /* Represent the data that we receive from the backend. When we do getCourses we're getting a list of courses and we're saving it to a tag of Courses. This will be important when we do invalidation of courses. */
-  tagTypes: ["Courses"],
+  tagTypes: ["Courses", "Users"],
   endpoints: (build) => ({
+    updateUser: build.mutation<User, Partial<User> & { userId: string }>({
+      query: ({ userId, ...updatedUser }) => ({
+        url: `/users/clerk/${userId}`,
+        method: "PUT",
+        body: updatedUser,
+      }),
+      /* Anytime we update a list of user, the entire user list will be refetch */
+      invalidatesTags: ["Users"],
+    }),
     /* The first argument Course[] is what we're going to receive from the backend, and what we need to send is going to be on the second argument. */
     getCourses: build.query<Course[], { category?: string }>({
       query: ({ category }) => ({
@@ -50,4 +60,5 @@ export const api = createApi({
   }),
 });
 
-export const { useGetCoursesQuery, useGetCourseQuery } = api;
+export const { useUpdateUserMutation, useGetCoursesQuery, useGetCourseQuery } =
+  api;

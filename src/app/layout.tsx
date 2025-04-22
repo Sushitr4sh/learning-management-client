@@ -3,6 +3,7 @@ import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "@/components/ui/toaster";
 
 const dmSans = DM_Sans({
   subsets: ["latin"], // Only loading the Latin character subset (reduces file size)
@@ -27,6 +28,7 @@ export default function RootLayout({
           <Providers>
             <div className="root-layout">{children}</div>
           </Providers>
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>

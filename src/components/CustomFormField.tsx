@@ -77,7 +77,7 @@ export const CustomFormField: React.FC<FormFieldProps> = ({
   const { control } = useFormContext();
 
   const renderFormControl = (
-    field: ControllerRenderProps<FieldValues, string>
+    field: ControllerRenderProps<FieldValues, string>,
   ) => {
     switch (type) {
       case "textarea":
@@ -101,7 +101,7 @@ export const CustomFormField: React.FC<FormFieldProps> = ({
             >
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
-            <SelectContent className="w-full bg-customgreys-primarybg border-customgreys-dirtyGrey shadow">
+            <SelectContent className="w-full border-customgreys-dirtyGrey bg-customgreys-primarybg shadow">
               {options?.map((option) => (
                 <SelectItem
                   key={option.value}
@@ -141,7 +141,7 @@ export const CustomFormField: React.FC<FormFieldProps> = ({
               field.onChange(
                 multiple
                   ? fileItems.map((fileItem) => fileItem.file)
-                  : fileItems[0]?.file
+                  : fileItems[0]?.file,
               );
             }}
             acceptedFileTypes={acceptedFileTypes}
@@ -193,9 +193,9 @@ export const CustomFormField: React.FC<FormFieldProps> = ({
           } relative ${className}`}
         >
           {type !== "switch" && (
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
               <FormLabel
-                className={`text-customgreys-dirtyGrey text-sm ${labelClassName}`}
+                className={`text-sm text-customgreys-dirtyGrey ${labelClassName}`}
               >
                 {label}
               </FormLabel>
@@ -262,7 +262,7 @@ const MultiInputField: React.FC<MultiInputFieldProps> = ({
             size="icon"
             className="text-customgreys-dirtyGrey"
           >
-            <X className="w-4 h-4" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
       ))}
@@ -273,7 +273,7 @@ const MultiInputField: React.FC<MultiInputFieldProps> = ({
         size="sm"
         className="mt-2 text-customgreys-dirtyGrey"
       >
-        <Plus className="w-4 h-4 mr-2" />
+        <Plus className="mr-2 h-4 w-4" />
         Add Item
       </Button>
     </div>

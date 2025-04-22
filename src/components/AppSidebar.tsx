@@ -2,6 +2,8 @@ import { useClerk, useUser } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import {
   Sidebar,
+  SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -12,12 +14,15 @@ import {
   BookOpen,
   Briefcase,
   DollarSign,
+  LogOut,
   PanelLeft,
   Settings,
   User,
 } from "lucide-react";
 import Loading from "./Loading";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const AppSidebar = () => {
   const { user, isLoaded } = useUser();
@@ -78,6 +83,62 @@ const AppSidebar = () => {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
+      <SidebarContent>
+        <SidebarMenu className="app-sidebar__nav-menu">
+          {currentNavLinks.map((link) => {
+            const isActive = pathname.startsWith(link.href);
+            return (
+              <SidebarMenuItem
+                key={link.href}
+                className={cn("app-sidebar__nav-item", {
+                  "bg-gray-800": isActive,
+                })}
+              >
+                <SidebarMenuButton
+                  asChild
+                  size="lg"
+                  className={cn(
+                    "app-sidebar__nav-button",
+                    !isActive && "text-customgreys-dirtyGrey",
+                  )}
+                >
+                  <Link href={link.href} className="app-sidebar__nav-link">
+                    <link.icon
+                      className={isActive ? "text-white-50" : "text-gray-500"}
+                    />
+                    <span
+                      className={cn(
+                        "app-sidebar__nav-text",
+                        isActive ? "text-white-50" : "text-gray-500",
+                      )}
+                    >
+                      {link.label}
+                    </span>
+                  </Link>
+                </SidebarMenuButton>
+                {isActive && <div className="app-sidebar__active-indicator" />}
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
+      </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <button
+                onClick={() => signOut()}
+                className="app-sidebar__signout"
+              >
+                <LogOut className="mr-2 h-6 w-6" />
+                <span className="">Sign out</span>
+              </button>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 };
