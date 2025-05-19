@@ -16,7 +16,7 @@ const SignInComponent = () => {
 
   const getRedirectUrl = () => {
     if (isCheckoutPage) {
-      return `/checkout?step=2&id=${courseId}`;
+      return `/checkout?step=2&id=${courseId}&showSignUp=true`;
     }
 
     const userType = user?.publicMetadata?.userType as string;

@@ -1,26 +1,23 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
 import {
   NotificationSettingsFormData,
   notificationSettingsSchema,
 } from "@/lib/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useUpdateUserMutation } from "@/state/api";
 import { useUser } from "@clerk/nextjs";
-import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import Header from "./Header";
-import { Form } from "@/components/ui/form";
 import { CustomFormField } from "./CustomFormField";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import Header from "./Header";
 
 const SharedNotificationSettings = ({
   title = "Notification Settings",
   subtitle = "Manage your notification settings",
 }: SharedNotificationSettingsProps) => {
   const { user } = useUser();
-  const { toast } = useToast();
 
   /* When querying before, we use object instead of array. When we use mutation we're using array, which gives us a function we can invoke to update our user on the backend */
   const [updateUser] = useUpdateUserMutation();
@@ -56,16 +53,6 @@ const SharedNotificationSettings = ({
 
     try {
       updateUser(updatedUser);
-      toast({
-        title: "Settings updated: ",
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">
-              {JSON.stringify(updatedUser.publicMetadata.settings, null, 4)}
-            </code>
-          </pre>
-        ),
-      });
     } catch (error) {
       console.error("Failed to update user settings: ", error);
     }

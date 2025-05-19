@@ -1,6 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { BaseQueryApi, FetchArgs } from "@reduxjs/toolkit/query";
 import { User } from "@clerk/nextjs/server";
+import { Clerk } from "@clerk/clerk-js";
+import { toast } from "sonner";
 
 const customBaseQuery = async (
   args: string | FetchArgs,
@@ -9,15 +11,45 @@ const customBaseQuery = async (
 ) => {
   const baseQuery = fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+    prepareHeaders: async (headers) => {
+      const token = await window.Clerk?.session?.getToken();
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
   });
 
   try {
     /* Anytime we hit an endpoint like getCourses or getCourse call, it's going to run through this customBaseQuery and it's going to apply it to every single endoint so we can modify it to whatever we want. */
     const result: any = await baseQuery(args, api, extraOptions);
 
+    /* Configure toast message */
+    if (result.error) {
+      const errorData = result.error.data;
+      const errorMessage =
+        errorData?.message ||
+        result.error.status.toString() ||
+        "An error occured ";
+      toast.error(`Error: ${errorMessage}`);
+    }
+
+    const isMutationRequest =
+      (args as FetchArgs).method && (args as FetchArgs).method !== "GET";
+
+    if (isMutationRequest) {
+      const successMessage = result.data?.message;
+      if (successMessage) toast.success(successMessage);
+    }
+
     /* Remove the message to only have array of objects of our course */
     if (result.data) {
       result.data = result.data.data;
+    } else if (
+      result.error?.status === 204 ||
+      result.meta?.response?.status == 204
+    ) {
+      return { data: null };
     }
 
     return result;
@@ -57,8 +89,22 @@ export const api = createApi({
       /* When we grab the course, we're going to find the type of courses for the tags, but we're going to find one that has the exact ID of the getCourse. The reason why we need to specify this is so that if we grab a course individually, it's going to update the courses value automatically on the frontend. When we grab a list of courses(getCourses) and we call getCourse it's going to update that specific course in the Courses tag. It's a way of doing invalidation that makes life easier. This is similar to reactQuery.*/
       providesTags: (result, error, id) => [{ type: "Courses", id }],
     }),
+    createStripePaymentIntent: build.mutation<
+      { clientSecret: string },
+      { amount: number }
+    >({
+      query: ({ amount }) => ({
+        url: `/transactions/stripe/payment-intent`,
+        method: "POST",
+        body: { amount },
+      }),
+    }),
   }),
 });
 
-export const { useUpdateUserMutation, useGetCoursesQuery, useGetCourseQuery } =
-  api;
+export const {
+  useUpdateUserMutation,
+  useGetCoursesQuery,
+  useGetCourseQuery,
+  useCreateStripePaymentIntentMutation,
+} = api;
