@@ -89,6 +89,9 @@ export const api = createApi({
       /* When we grab the course, we're going to find the type of courses for the tags, but we're going to find one that has the exact ID of the getCourse. The reason why we need to specify this is so that if we grab a course individually, it's going to update the courses value automatically on the frontend. When we grab a list of courses(getCourses) and we call getCourse it's going to update that specific course in the Courses tag. It's a way of doing invalidation that makes life easier. This is similar to reactQuery.*/
       providesTags: (result, error, id) => [{ type: "Courses", id }],
     }),
+    getTransactions: build.query<Transaction[], string>({
+      query: (userId) => `/transactions?userId=${userId}`,
+    }),
     createStripePaymentIntent: build.mutation<
       { clientSecret: string },
       { amount: number }
@@ -113,6 +116,7 @@ export const {
   useUpdateUserMutation,
   useGetCoursesQuery,
   useGetCourseQuery,
+  useGetTransactionsQuery,
   useCreateStripePaymentIntentMutation,
   useCreateTransactionMutation,
 } = api;
