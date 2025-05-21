@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FormEvent } from "react";
 import StripeProvider from "./StripeProvider";
 import {
   PaymentElement,
@@ -11,15 +11,54 @@ import CoursePreview from "@/components/CoursePreview";
 import { CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCurrentCourse } from "@/hooks/useCurrentCourse";
+import { useCreateTransactionMutation } from "@/state/api";
+import { toast } from "sonner";
 
 const PaymentPageContent = () => {
   const stripe = useStripe();
   const elements = useElements();
-  /* const [createTransaction] = useCreateTransactionMutation(); */
+  const [createTransaction] = useCreateTransactionMutation();
   const { navigateToStep } = useCheckoutNavigation();
   const { course, courseId } = useCurrentCourse();
   const { user } = useUser();
   const { signOut } = useClerk();
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    if (!stripe || !elements) {
+      toast.error("Stripe service is not available");
+      return;
+    }
+
+    const result = await stripe.confirmPayment({
+      // Grab the elements from the provided input in PaymentElement
+      elements,
+      confirmParams: {
+        return_url: `${process.env.NEXT_PUBLIC_STRIPE_REDIRECT_URL}?id=${courseId}`,
+      },
+      redirect: "if_required",
+    });
+
+    if (result.paymentIntent?.status === "succeeded") {
+      const transactionData: Partial<Transaction> = {
+        // Transaction ID is coming from stripe payment ID, So if we ever need to grab information from stripe about the payment transaction, this is the ID that we're using that coming directly from stripe
+        transactionId: result.paymentIntent.id,
+        userId: user?.id,
+        courseId: courseId,
+        paymentProvider: "stripe",
+        amount: course?.price || 0,
+      };
+
+      await createTransaction(transactionData);
+      navigateToStep(3);
+    }
+  };
+
+  const handleSignOutAndNavigate = async () => {
+    await signOut();
+    navigateToStep(1);
+  };
 
   if (!course) return null;
 
@@ -35,7 +74,7 @@ const PaymentPageContent = () => {
         <div className="payment__form-container">
           <form
             id="payment-form"
-            /* onSubmit={handleSubmit} */
+            onSubmit={handleSubmit}
             className="payment__form"
           >
             <div className="payment__content">
@@ -66,7 +105,7 @@ const PaymentPageContent = () => {
       <div className="payment__actions">
         <Button
           className="hover:bg-white-50/10"
-          /* onClick={handleSignOutAndNavigate} */
+          onClick={handleSignOutAndNavigate}
           variant="outline"
           type="button"
         >
