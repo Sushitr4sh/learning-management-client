@@ -1,4 +1,4 @@
-import React, { FormEvent } from "react";
+import React, { FormEvent, useState } from "react";
 import StripeProvider from "./StripeProvider";
 import {
   PaymentElement,
@@ -8,7 +8,7 @@ import {
 import { useCheckoutNavigation } from "@/hooks/useCheckoutNavigation";
 import { useClerk, useUser } from "@clerk/nextjs";
 import CoursePreview from "@/components/CoursePreview";
-import { CreditCard } from "lucide-react";
+import { CreditCard, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCurrentCourse } from "@/hooks/useCurrentCourse";
 import { useCreateTransactionMutation } from "@/state/api";
@@ -22,6 +22,7 @@ const PaymentPageContent = () => {
   const { course, courseId } = useCurrentCourse();
   const { user } = useUser();
   const { signOut } = useClerk();
+    const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -31,11 +32,13 @@ const PaymentPageContent = () => {
       return;
     }
 
+    setIsProcessingPayment(true)
+
     const result = await stripe.confirmPayment({
       // Grab the elements from the provided input in PaymentElement
       elements,
       confirmParams: {
-        return_url: `${process.env.NEXT_PUBLIC_STRIPE_REDIRECT_URL}?id=${courseId}`,
+        return_url: `${process.env.NEXT_PUBLIC_STRIPE_REDIRECT_URL}&id=${courseId}`,
       },
       redirect: "if_required",
     });
@@ -52,6 +55,8 @@ const PaymentPageContent = () => {
 
       await createTransaction(transactionData);
       navigateToStep(3);
+    } else {
+      setIsProcessingPayment(false);
     }
   };
 
@@ -116,9 +121,9 @@ const PaymentPageContent = () => {
           form="payment-form"
           type="submit"
           className="payment__submit"
-          disabled={!stripe || !elements}
+          disabled={!stripe || !elements || isProcessingPayment}
         >
-          Pay with Credit Card
+          {isProcessingPayment ? <Loader2 className="h-4 w-4 animate-spin"/> : "Pay with Credit Card"}
         </Button>
       </div>
     </div>

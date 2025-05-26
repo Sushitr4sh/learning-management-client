@@ -96,7 +96,7 @@ export default function DroppableComponent() {
                                     />
                                   )}
                                 </Draggable>
-                              )
+                              ),
                             )}
                             {droppableProvider.placeholder}
                           </div>
@@ -113,7 +113,7 @@ export default function DroppableComponent() {
                           openChapterModal({
                             sectionIndex,
                             chapterIndex: null,
-                          })
+                          }),
                         )
                       }
                       className="add-chapter-button group"
@@ -151,7 +151,7 @@ const SectionHeader = ({
       <div className="droppable-section__title-wrapper">
         <div className="droppable-section__title-container">
           <div className="droppable-section__title">
-            <GripVertical className="h-6 w-6 mb-1" />
+            <GripVertical className="mb-1 h-6 w-6" />
             <h3 className="text-lg font-medium">{section.sectionTitle}</h3>
           </div>
           <div className="droppable-chapter__actions">
@@ -210,7 +210,7 @@ const ChapterItem = ({
       }`}
     >
       <div className="droppable-chapter__title">
-        <GripVertical className="h-4 w-4 mb-[2px]" />
+        <GripVertical className="mb-[2px] h-4 w-4" />
         <p className="text-sm">{`${chapterIndex + 1}. ${chapter.title}`}</p>
       </div>
       <div className="droppable-chapter__actions">
@@ -224,7 +224,7 @@ const ChapterItem = ({
               openChapterModal({
                 sectionIndex,
                 chapterIndex,
-              })
+              }),
             )
           }
         >
@@ -240,7 +240,7 @@ const ChapterItem = ({
               deleteChapter({
                 sectionIndex,
                 chapterIndex,
-              })
+              }),
             )
           }
         >

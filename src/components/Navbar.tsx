@@ -8,9 +8,8 @@ import { useState } from "react";
 import { SidebarTrigger } from "./ui/sidebar";
 import { cn } from "@/lib/utils";
 
-const Navbar = ({ iscoursePage }: [isCoursePage: boolean]) => {
+const Navbar = ({ isCoursePage }: { isCoursePage: boolean }) => {
   const { user } = useUser();
-  console.log("user:", user);
   const userRole = user?.publicMetadata?.userType as "student" | "teacher";
   return (
     <nav className="dashboard-navbar">
@@ -24,7 +23,7 @@ const Navbar = ({ iscoursePage }: [isCoursePage: boolean]) => {
               <Link
                 href="/search"
                 className={cn("dashboard-navbar__search-input", {
-                  "!bg-customgreys-secondarybg": iscoursePage,
+                  "!bg-customgreys-secondarybg": isCoursePage,
                 })}
               >
                 <span className="hidden sm:inline">Search Courses</span>
