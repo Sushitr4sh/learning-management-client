@@ -22,7 +22,7 @@ const PaymentPageContent = () => {
   const { course, courseId } = useCurrentCourse();
   const { user } = useUser();
   const { signOut } = useClerk();
-    const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -32,13 +32,18 @@ const PaymentPageContent = () => {
       return;
     }
 
-    setIsProcessingPayment(true)
+    setIsProcessingPayment(true);
+
+    const baseUrl = process.env.NEXT_PUBLIC_LOCAL_URL
+      ? `http://${process.env.NEXT_PUBLIC_LOCAL_URL}`
+      : process.env.NEXT_PUBLIC_VERCEL_URL // Will be available on deployment, dynamically generated url.
+        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+        : undefined;
 
     const result = await stripe.confirmPayment({
-      // Grab the elements from the provided input in PaymentElement
       elements,
       confirmParams: {
-        return_url: `${process.env.NEXT_PUBLIC_STRIPE_REDIRECT_URL}&id=${courseId}`,
+        return_url: `${baseUrl}/checkout?step=3&id=${courseId}`,
       },
       redirect: "if_required",
     });
@@ -123,7 +128,11 @@ const PaymentPageContent = () => {
           className="payment__submit"
           disabled={!stripe || !elements || isProcessingPayment}
         >
-          {isProcessingPayment ? <Loader2 className="h-4 w-4 animate-spin"/> : "Pay with Credit Card"}
+          {isProcessingPayment ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            "Pay with Credit Card"
+          )}
         </Button>
       </div>
     </div>

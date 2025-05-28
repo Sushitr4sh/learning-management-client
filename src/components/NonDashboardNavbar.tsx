@@ -12,7 +12,7 @@ const NonDashboardNavbar = () => {
     <nav className="nondashboard-navbar">
       <div className="nondashboard-navbar__container">
         <div className="nondashboard-navbar__search">
-          <Link href="/" className="nondashboard-navbar__brand">
+          <Link href="/" className="nondashboard-navbar__brand" scroll={false}>
             SUSHITR4SH
           </Link>
           <div className="flex items-center gap-4">
